@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Games</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #08131d;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+
+    h1 {
+      color: white;
+      font-size: 28px;
+      letter-spacing: 2px;
+      margin-bottom: 22px;
+      text-transform: uppercase;
+    }
+
+    .library {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .row {
+      display: grid;
+      gap: 20px;
+    }
+
+    .row.big {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .row.small {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .game {
+      position: relative;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #111;
+      display: block;
+      transition: 0.18s ease;
+    }
+
+    .row.big .game {
+      height: 290px;
+    }
+
+    .row.small .game {
+      height: 180px;
+    }
+
+    .game:hover {
+      transform: scale(1.01);
+      filter: brightness(1.08);
+    }
+
+    .game img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.82) 0%,
+        rgba(0,0,0,0.15) 45%,
+        rgba(0,0,0,0) 100%
+      );
+    }
+
+    .title {
+      position: absolute;
+      left: 18px;
+      bottom: 14px;
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    }
+
+    .row.small .title {
+      font-size: 20px;
+    }
+
+    @media (max-width: 1000px) {
+      .row.big,
+      .row.small {
+        grid-template-columns: 1fr;
+      }
+
+      .row.big .game,
+      .row.small .game {
+        height: 240px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 18px;
+      }
+
+      .row.big .game,
+      .row.small .game {
+        height: 200px;
+      }
+
+      .title {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Games</h1>
+
+  <main class="library">
+
+    <!-- 2 BIG -->
+    <div class="row big">
+      <a class="game" href="marioKart/marioKart.html">
+        <img src="images/marioKart.png" alt="">
+        <div class="overlay"></div>
+        <div class="title">Mushroom Kingdom GP</div>
+      </a>
+
+      <a class="game" href="iceCreamUnicorn/iceCreamUnicorn.html">
+        <img src="images/iceCreamUnicorn.png" alt="">
+        <div class="overlay"></div>
+        <div class="title">Ice Cream Unicorn</div>
+      </a>
+    </div>
+
+    <!-- 3 SMALL -->
+    <div class="row small">
+      <a class="game" href="donutCatcher/donutCatcher.html">
+        <img src="images/donutCatcher.png" alt="">
+        <div class="overlay"></div>
+        <div class="title">Donut Catcher</div>
+      </a>
+
+      <a class="game" href="hideAndSeek/hideAndSeek.html">
+        <img src="images/hideAndSeek.png" alt="">
+        <div class="overlay"></div>
+        <div class="title">Hide And Seek</div>
+      </a>
+
+      <a class="game" href="demonHunters/demonHunters.html">
+        <img src="images/demonHunters.png" alt="">
+        <div class="overlay"></div>
+        <div class="title">Demon Hunters</div>
+      </a>
+    </div>
+
+  </main>
+</body>
+</html>

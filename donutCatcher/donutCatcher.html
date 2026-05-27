@@ -1,0 +1,369 @@
+<div id="game-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:1rem 0;font-family:var(--font-sans)">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:480px;margin-bottom:8px;font-size:14px;color:var(--color-text-secondary)">
+    <div>Score: <span id="score" style="color:var(--color-text-primary);font-weight:500">0</span></div>
+    <div>Level: <span id="level" style="color:var(--color-text-primary);font-weight:500">1</span></div>
+    <div>Lives: <span id="lives" style="color:var(--color-text-primary);font-weight:500">3</span></div>
+  </div>
+  <canvas id="game" width="480" height="560" style="background:#FFF4E6;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);max-width:100%;touch-action:none;display:block"></canvas>
+  <div style="margin-top:10px;font-size:13px;color:var(--color-text-secondary);text-align:center">
+    Use ← → arrow keys, A/D, or drag/tap on the canvas. Catch donuts, dodge turtles!
+  </div>
+  <div id="overlay" style="display:none;margin-top:10px"></div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('game');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const scoreEl=document.getElementById('score');
+  const levelEl=document.getElementById('level');
+  const livesEl=document.getElementById('lives');
+  const overlay=document.getElementById('overlay');
+
+  const characters=[
+    {name:'Peanut the Hamster',body:'#F4C275',belly:'#FFE4C4',ear:'#D89A4F',cheek:'#F7B5B5'},
+    {name:'Mochi the Bunny',body:'#FFFFFF',belly:'#FFE9F1',ear:'#FFC4D6',cheek:'#FF9EC0'},
+    {name:'Pip the Chick',body:'#FFD93D',belly:'#FFF1A8',ear:'#F2A900',cheek:'#FFB3B3'},
+    {name:'Berry the Kitten',body:'#C9A0FF',belly:'#EEDDFF',ear:'#8E66E0',cheek:'#FFB0D8'},
+    {name:'Star the Pup',body:'#FFAA70',belly:'#FFE0C8',ear:'#D87A48',cheek:'#FF9999'}
+  ];
+
+  const state={
+    px:W/2, py:H-70, pw:54, ph:46,
+    vx:0, speed:5,
+    donuts:[], turtles:[], particles:[],
+    score:0, level:1, lives:3,
+    spawnT:0, turtleT:0,
+    charIdx:0, running:true, message:null, messageT:0,
+    keys:{}, dragging:false
+  };
+
+  // Input
+  window.addEventListener('keydown',e=>{
+    if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)){state.keys[e.key]=true;e.preventDefault&&e.preventDefault()}
+    if(e.key===' '&&!state.running){restart()}
+  });
+  window.addEventListener('keyup',e=>{state.keys[e.key]=false});
+
+  function setPointer(clientX){
+    const r=canvas.getBoundingClientRect();
+    const scale=W/r.width;
+    state.px=(clientX-r.left)*scale;
+  }
+  canvas.addEventListener('mousedown',e=>{state.dragging=true;setPointer(e.clientX)});
+  canvas.addEventListener('mousemove',e=>{if(state.dragging)setPointer(e.clientX)});
+  window.addEventListener('mouseup',()=>state.dragging=false);
+  canvas.addEventListener('touchstart',e=>{state.dragging=true;setPointer(e.touches[0].clientX);e.preventDefault()},{passive:false});
+  canvas.addEventListener('touchmove',e=>{setPointer(e.touches[0].clientX);e.preventDefault()},{passive:false});
+  canvas.addEventListener('touchend',()=>state.dragging=false);
+
+  const donutColors=[
+    {glaze:'#FF8FB1',sprinkle:['#FFD93D','#7ED6DF','#FFFFFF','#A29BFE']},
+    {glaze:'#A29BFE',sprinkle:['#FFFFFF','#FFD93D','#FF8FB1','#7ED6DF']},
+    {glaze:'#7ED6DF',sprinkle:['#FF8FB1','#FFFFFF','#FFD93D','#A29BFE']},
+    {glaze:'#FFB347',sprinkle:['#FFFFFF','#FF8FB1','#7ED6DF','#A29BFE']},
+    {glaze:'#6B4226',sprinkle:['#FFFFFF','#FFD93D','#FF8FB1','#7ED6DF']}
+  ];
+
+  function spawnDonut(){
+    const c=donutColors[Math.floor(Math.random()*donutColors.length)];
+    state.donuts.push({
+      x:30+Math.random()*(W-60), y:-20,
+      r:18, vy:1.6+Math.random()*0.8+state.level*0.25,
+      rot:Math.random()*Math.PI*2, vr:(Math.random()-0.5)*0.08,
+      glaze:c.glaze, sprinkle:c.sprinkle, seed:Math.random()*1000
+    });
+  }
+  function spawnTurtle(){
+    state.turtles.push({
+      x:30+Math.random()*(W-60), y:-30,
+      r:20, vy:1.2+Math.random()*0.6+state.level*0.2,
+      wobble:Math.random()*Math.PI*2
+    });
+  }
+
+  function rectCircleHit(cx,cy,cr,rx,ry,rw,rh){
+    const tx=Math.max(rx,Math.min(cx,rx+rw));
+    const ty=Math.max(ry,Math.min(cy,ry+rh));
+    const dx=cx-tx,dy=cy-ty;
+    return dx*dx+dy*dy<cr*cr;
+  }
+
+  function popParticles(x,y,color){
+    for(let i=0;i<10;i++){
+      state.particles.push({
+        x,y,vx:(Math.random()-0.5)*4,vy:-Math.random()*4-1,
+        life:30,color
+      });
+    }
+  }
+
+  function flashMessage(text,ms=1600){
+    state.message=text; state.messageT=ms/16;
+  }
+
+  // Drawing
+  function drawDonut(d){
+    ctx.save();
+    ctx.translate(d.x,d.y);
+    ctx.rotate(d.rot);
+    // dough
+    ctx.fillStyle='#E8A87C';
+    ctx.beginPath();ctx.arc(0,0,d.r,0,Math.PI*2);ctx.fill();
+    // glaze
+    ctx.fillStyle=d.glaze;
+    ctx.beginPath();ctx.arc(0,0,d.r-2,0,Math.PI*2);ctx.fill();
+    // hole
+    ctx.fillStyle='#FFF4E6';
+    ctx.beginPath();ctx.arc(0,0,d.r*0.32,0,Math.PI*2);ctx.fill();
+    // sprinkles
+    for(let i=0;i<8;i++){
+      const a=(i/8)*Math.PI*2+d.seed*0.01;
+      const rr=d.r*0.6;
+      const sx=Math.cos(a)*rr, sy=Math.sin(a)*rr;
+      ctx.fillStyle=d.sprinkle[i%d.sprinkle.length];
+      ctx.save();
+      ctx.translate(sx,sy);
+      ctx.rotate(a);
+      ctx.fillRect(-3,-1,6,2);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawTurtle(t){
+    ctx.save();
+    ctx.translate(t.x,t.y+Math.sin(t.wobble)*1.5);
+    // legs
+    ctx.fillStyle='#7CB342';
+    ctx.beginPath();ctx.arc(-t.r*0.7,t.r*0.4,5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(t.r*0.7,t.r*0.4,5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(-t.r*0.7,-t.r*0.4,5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(t.r*0.7,-t.r*0.4,5,0,Math.PI*2);ctx.fill();
+    // head
+    ctx.fillStyle='#9CCC65';
+    ctx.beginPath();ctx.arc(0,t.r+2,7,0,Math.PI*2);ctx.fill();
+    // shell
+    ctx.fillStyle='#558B2F';
+    ctx.beginPath();ctx.arc(0,0,t.r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#7CB342';
+    ctx.beginPath();ctx.arc(0,0,t.r*0.75,0,Math.PI*2);ctx.fill();
+    // shell pattern
+    ctx.fillStyle='#558B2F';
+    for(let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2;
+      ctx.beginPath();ctx.arc(Math.cos(a)*t.r*0.4,Math.sin(a)*t.r*0.4,3.5,0,Math.PI*2);ctx.fill();
+    }
+    // angry eyes
+    ctx.fillStyle='#FFFFFF';
+    ctx.beginPath();ctx.arc(-3,t.r+1,2.2,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(3,t.r+1,2.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';
+    ctx.beginPath();ctx.arc(-2.5,t.r+1.5,1.2,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(3.5,t.r+1.5,1.2,0,Math.PI*2);ctx.fill();
+    // angry brows
+    ctx.strokeStyle='#3E2723';ctx.lineWidth=1.8;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-6,t.r-2);ctx.lineTo(-1,t.r);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(6,t.r-2);ctx.lineTo(1,t.r);ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCharacter(){
+    const c=characters[state.charIdx];
+    const x=state.px, y=state.py;
+    ctx.save();
+    ctx.translate(x,y);
+    const tilt=Math.max(-0.15,Math.min(0.15,state.vx*0.03));
+    ctx.rotate(tilt);
+    // ears
+    ctx.fillStyle=c.ear;
+    ctx.beginPath();ctx.ellipse(-18,-18,8,10,-0.3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(18,-18,8,10,0.3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=c.cheek;
+    ctx.beginPath();ctx.ellipse(-18,-17,4,5,-0.3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(18,-17,4,5,0.3,0,Math.PI*2);ctx.fill();
+    // body
+    ctx.fillStyle=c.body;
+    ctx.beginPath();ctx.ellipse(0,0,26,22,0,0,Math.PI*2);ctx.fill();
+    // belly
+    ctx.fillStyle=c.belly;
+    ctx.beginPath();ctx.ellipse(0,5,18,14,0,0,Math.PI*2);ctx.fill();
+    // cheeks
+    ctx.fillStyle=c.cheek;
+    ctx.beginPath();ctx.arc(-14,4,4,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(14,4,4,0,Math.PI*2);ctx.fill();
+    // eyes
+    ctx.fillStyle='#1a1a1a';
+    ctx.beginPath();ctx.arc(-8,-3,3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(8,-3,3,0,Math.PI*2);ctx.fill();
+    // eye sparkle
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(-7,-4,1,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(9,-4,1,0,Math.PI*2);ctx.fill();
+    // nose
+    ctx.fillStyle='#FF6B9D';
+    ctx.beginPath();ctx.arc(0,2,1.8,0,Math.PI*2);ctx.fill();
+    // smile
+    ctx.strokeStyle='#3E2723';ctx.lineWidth=1.4;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(-2,3,2,0,Math.PI*0.8);ctx.stroke();
+    ctx.beginPath();ctx.arc(2,3,2,Math.PI*0.2,Math.PI);ctx.stroke();
+    // little basket / arms
+    ctx.fillStyle='#B07045';
+    ctx.fillRect(-14,12,28,6);
+    ctx.fillStyle='#8B5A2B';
+    ctx.fillRect(-14,12,28,2);
+    ctx.restore();
+  }
+
+  function drawBackground(){
+    // sky
+    ctx.fillStyle='#FFF4E6';
+    ctx.fillRect(0,0,W,H);
+    // soft clouds
+    ctx.fillStyle='#FFFFFF';
+    const t=Date.now()*0.00005;
+    for(let i=0;i<4;i++){
+      const cx=((i*150+t*300)%(W+100))-50;
+      const cy=40+i*30;
+      ctx.beginPath();ctx.arc(cx,cy,16,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(cx+14,cy+4,12,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(cx-12,cy+4,12,0,Math.PI*2);ctx.fill();
+    }
+    // ground
+    ctx.fillStyle='#C8E6C9';
+    ctx.fillRect(0,H-40,W,40);
+    ctx.fillStyle='#A5D6A7';
+    for(let i=0;i<W;i+=20){
+      ctx.beginPath();
+      ctx.moveTo(i,H-40);
+      ctx.lineTo(i+5,H-46);
+      ctx.lineTo(i+10,H-40);
+      ctx.fill();
+    }
+  }
+
+  function levelUp(){
+    state.level++;
+    levelEl.textContent=state.level;
+    if(state.level-1<characters.length && state.level>1){
+      const idx=Math.min(state.level-1,characters.length-1);
+      if(idx!==state.charIdx){
+        state.charIdx=idx;
+        flashMessage('New friend: '+characters[state.charIdx].name+'!');
+      }else{
+        flashMessage('Level '+state.level+'!');
+      }
+    }else{
+      flashMessage('Level '+state.level+'!');
+    }
+  }
+
+  function update(){
+    if(!state.running)return;
+    // movement
+    let dir=0;
+    if(state.keys['ArrowLeft']||state.keys['a']||state.keys['A'])dir-=1;
+    if(state.keys['ArrowRight']||state.keys['d']||state.keys['D'])dir+=1;
+    if(dir!==0){
+      state.vx=dir*state.speed;
+      state.px+=state.vx;
+    }else{
+      state.vx*=0.7;
+    }
+    state.px=Math.max(state.pw/2,Math.min(W-state.pw/2,state.px));
+
+    // spawn
+    state.spawnT--;
+    if(state.spawnT<=0){
+      spawnDonut();
+      state.spawnT=Math.max(25,60-state.level*4);
+    }
+    state.turtleT--;
+    if(state.turtleT<=0 && state.level>=1){
+      spawnTurtle();
+      state.turtleT=Math.max(60,140-state.level*8);
+    }
+
+    // donuts
+    for(let i=state.donuts.length-1;i>=0;i--){
+      const d=state.donuts[i];
+      d.y+=d.vy; d.rot+=d.vr;
+      if(rectCircleHit(d.x,d.y,d.r,state.px-state.pw/2,state.py-state.ph/2,state.pw,state.ph)){
+        state.score+=10;
+        scoreEl.textContent=state.score;
+        popParticles(d.x,d.y,d.glaze);
+        state.donuts.splice(i,1);
+        if(state.score>0 && state.score%100===0)levelUp();
+        continue;
+      }
+      if(d.y>H+30)state.donuts.splice(i,1);
+    }
+    // turtles
+    for(let i=state.turtles.length-1;i>=0;i--){
+      const t=state.turtles[i];
+      t.y+=t.vy; t.wobble+=0.15;
+      // chase a little
+      if(state.px<t.x)t.x-=0.4;else t.x+=0.4;
+      if(rectCircleHit(t.x,t.y,t.r,state.px-state.pw/2,state.py-state.ph/2,state.pw,state.ph)){
+        state.lives--;
+        livesEl.textContent=state.lives;
+        popParticles(t.x,t.y,'#FF6B6B');
+        state.turtles.splice(i,1);
+        flashMessage('Ouch! Watch the turtles!',900);
+        if(state.lives<=0){gameOver();return}
+        continue;
+      }
+      if(t.y>H+30)state.turtles.splice(i,1);
+    }
+    // particles
+    for(let i=state.particles.length-1;i>=0;i--){
+      const p=state.particles[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life--;
+      if(p.life<=0)state.particles.splice(i,1);
+    }
+    if(state.messageT>0)state.messageT--;
+  }
+
+  function render(){
+    drawBackground();
+    state.donuts.forEach(drawDonut);
+    state.turtles.forEach(drawTurtle);
+    drawCharacter();
+    // particles
+    state.particles.forEach(p=>{
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=Math.max(0,p.life/30);
+      ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    // message
+    if(state.messageT>0&&state.message){
+      ctx.fillStyle='rgba(255,255,255,0.92)';
+      ctx.fillRect(W/2-150,H/2-26,300,52);
+      ctx.strokeStyle='#FF8FB1';ctx.lineWidth=2;
+      ctx.strokeRect(W/2-150,H/2-26,300,52);
+      ctx.fillStyle='#7A3550';
+      ctx.font='500 16px var(--font-sans), system-ui, sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(state.message,W/2,H/2);
+    }
+  }
+
+  function gameOver(){
+    state.running=false;
+    overlay.style.display='block';
+    overlay.innerHTML='<div style="text-align:center;padding:12px 16px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:14px"><div style="font-weight:500;font-size:16px;margin-bottom:6px">Game over!</div><div style="color:var(--color-text-secondary);margin-bottom:10px">Final score: '+state.score+' &middot; Level '+state.level+'</div><button id="restart-btn" style="padding:8px 16px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:14px;cursor:pointer">Play again</button></div>';
+    document.getElementById('restart-btn').onclick=restart;
+  }
+  function restart(){
+    state.px=W/2;state.donuts=[];state.turtles=[];state.particles=[];
+    state.score=0;state.level=1;state.lives=3;state.charIdx=0;
+    state.spawnT=0;state.turtleT=60;state.running=true;
+    scoreEl.textContent=0;levelEl.textContent=1;livesEl.textContent=3;
+    overlay.style.display='none';overlay.innerHTML='';
+  }
+
+  function loop(){update();render();requestAnimationFrame(loop)}
+  loop();
+})();
+</script>
