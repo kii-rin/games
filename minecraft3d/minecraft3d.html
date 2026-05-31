@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Block Craft 3D</title>
+<style>
+html,body{margin:0;overflow:hidden;background:#87ceeb;font-family:Arial,sans-serif}#ui{position:fixed;top:12px;left:12px;color:white;background:rgba(0,0,0,.45);padding:10px 12px;border-radius:8px;user-select:none;line-height:1.45;z-index:2}#crosshair{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);color:white;font-size:24px;text-shadow:0 1px 3px #000;z-index:2}.back{position:fixed;right:12px;top:12px;z-index:3;color:#102418;background:white;text-decoration:none;border-radius:999px;padding:8px 14px;font-weight:bold;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">Back</a>
+<div id="ui">Click to lock mouse<br>WASD move · Space jump<br>Left click break · Right click place<br>Keys 1-4 change block<br><strong>Selected: <span id="selected">grass</span></strong></div>
+<div id="crosshair">+</div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
+scene.fog=new THREE.Fog(0x87ceeb,25,80);
+
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:false});
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+document.body.appendChild(renderer.domElement);
+
+const sun=new THREE.DirectionalLight(0xffffff,1.4);
+sun.position.set(30,50,20);
+sun.castShadow=true;
+scene.add(sun);
+scene.add(new THREE.AmbientLight(0xffffff,.45));
+
+const materials={
+ grass:new THREE.MeshStandardMaterial({color:0x4caf50}),
+ dirt:new THREE.MeshStandardMaterial({color:0x8b5a2b}),
+ stone:new THREE.MeshStandardMaterial({color:0x888888}),
+ wood:new THREE.MeshStandardMaterial({color:0x8b4513}),
+ leaves:new THREE.MeshStandardMaterial({color:0x2e8b57})
+};
+const blockTypes=['grass','dirt','stone','wood'];
+let selectedBlock='grass';
+const geometry=new THREE.BoxGeometry(1,1,1);
+const blocks=new Map();
+const selected=document.getElementById('selected');
+
+function key(x,y,z){return `${x},${y},${z}`}
+function addBlock(x,y,z,type='grass'){
+ const id=key(x,y,z);
+ if(blocks.has(id))return;
+ const mesh=new THREE.Mesh(geometry,materials[type]);
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ mesh.userData={x,y,z,type};
+ scene.add(mesh);
+ blocks.set(id,mesh);
+}
+function removeBlock(mesh){
+ const {x,y,z}=mesh.userData;
+ scene.remove(mesh);
+ blocks.delete(key(x,y,z));
+}
+function heightAt(x,z){return Math.floor(Math.sin(x*.35)*1.5+Math.cos(z*.3)*1.5)}
+
+for(let x=-20;x<=20;x++){
+ for(let z=-20;z<=20;z++){
+  const h=heightAt(x,z);
+  addBlock(x,h,z,'grass');
+  addBlock(x,h-1,z,'dirt');
+  addBlock(x,h-2,z,'stone');
+  if(Math.random()<.015&&h>-1){
+   addBlock(x,h+1,z,'wood');
+   addBlock(x,h+2,z,'wood');
+   addBlock(x,h+3,z,'wood');
+   for(let lx=-1;lx<=1;lx++)for(let lz=-1;lz<=1;lz++)addBlock(x+lx,h+4,z+lz,'leaves');
+   addBlock(x,h+5,z,'leaves');
+  }
+ }
+}
+
+const player={position:new THREE.Vector3(0,8,8),velocity:new THREE.Vector3(),yaw:0,pitch:0,grounded:false};
+const keys={};
+addEventListener('keydown',e=>{
+ keys[e.key.toLowerCase()]=true;
+ if(['1','2','3','4'].includes(e.key)){
+  selectedBlock=blockTypes[Number(e.key)-1];
+  selected.textContent=selectedBlock;
+ }
+});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.body.addEventListener('click',()=>document.body.requestPointerLock());
+addEventListener('mousemove',e=>{
+ if(document.pointerLockElement!==document.body)return;
+ player.yaw-=e.movementX*.002;
+ player.pitch-=e.movementY*.002;
+ player.pitch=Math.max(-1.4,Math.min(1.4,player.pitch));
+});
+
+const raycaster=new THREE.Raycaster();
+const mouseCenter=new THREE.Vector2(0,0);
+addEventListener('mousedown',e=>{
+ if(document.pointerLockElement!==document.body)return;
+ raycaster.setFromCamera(mouseCenter,camera);
+ const hits=raycaster.intersectObjects([...blocks.values()],false);
+ if(!hits.length||hits[0].distance>6)return;
+ const hit=hits[0];
+ if(e.button===0)removeBlock(hit.object);
+ if(e.button===2){
+  const p=hit.object.position.clone().add(hit.face.normal);
+  addBlock(Math.round(p.x),Math.round(p.y),Math.round(p.z),selectedBlock);
+ }
+});
+addEventListener('contextmenu',e=>e.preventDefault());
+function blockExistsAt(x,y,z){return blocks.has(key(Math.round(x),Math.round(y),Math.round(z)))}
+function updatePlayer(){
+ const speed=.09;
+ const forward=new THREE.Vector3(Math.sin(player.yaw),0,Math.cos(player.yaw));
+ const right=new THREE.Vector3(Math.cos(player.yaw),0,-Math.sin(player.yaw));
+ if(keys.w)player.position.addScaledVector(forward,-speed);
+ if(keys.s)player.position.addScaledVector(forward,speed);
+ if(keys.a)player.position.addScaledVector(right,-speed);
+ if(keys.d)player.position.addScaledVector(right,speed);
+ player.velocity.y-=.015;
+ player.position.y+=player.velocity.y;
+ const footY=Math.floor(player.position.y-1.7);
+ const px=Math.round(player.position.x);
+ const pz=Math.round(player.position.z);
+ if(blockExistsAt(px,footY,pz)){
+  player.position.y=footY+2.25;
+  player.velocity.y=0;
+  player.grounded=true;
+ }else player.grounded=false;
+ if(keys[' ']&&player.grounded)player.velocity.y=.24;
+ camera.position.copy(player.position);
+ camera.rotation.order='YXZ';
+ camera.rotation.y=player.yaw;
+ camera.rotation.x=player.pitch;
+}
+function animate(){requestAnimationFrame(animate);updatePlayer();renderer.render(scene,camera)}
+animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
