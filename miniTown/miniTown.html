@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Town</title>
+<style>
+body{margin:0;background:#f8e7ff;font-family:Arial,sans-serif;color:#2d1738}main{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff8;border-bottom:2px solid #ead0f7}a,button{border:0;border-radius:999px;background:#9b5de5;color:white;padding:10px 16px;font-weight:700;text-decoration:none;cursor:pointer}.world{position:relative;overflow:hidden;margin:18px;border:4px solid white;border-radius:24px;background:linear-gradient(#bde0fe 0 45%,#caffbf 45% 100%);box-shadow:0 14px 40px #0002}.house{position:absolute;left:8%;bottom:18%;width:180px;height:150px;background:#ffcad4;border:4px solid white;border-radius:18px}.house:before{content:"";position:absolute;left:20px;top:-70px;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:75px solid #ff8fab}.door{position:absolute;bottom:0;left:65px;width:48px;height:78px;background:#9b5de5;border-radius:20px 20px 0 0}.shop{position:absolute;right:8%;bottom:18%;width:210px;height:130px;background:#fdffb6;border:4px solid white;border-radius:18px}.shop:before{content:"SNACKS";position:absolute;top:-36px;left:34px;background:white;border-radius:14px;padding:8px 28px;font-weight:900}.park{position:absolute;left:38%;bottom:13%;width:210px;height:90px;background:#80ed99;border-radius:50%;border:4px solid white}.item{position:absolute;user-select:none;touch-action:none;font-size:52px;cursor:grab;filter:drop-shadow(0 6px 3px #0002)}.item:active{cursor:grabbing;transform:scale(1.08)}.tray{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:14px;background:#fff8;border-top:2px solid #ead0f7}.hint{text-align:center;margin:0;padding:0 12px 14px;color:#5c4268}.bubble{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:white;padding:10px 16px;border-radius:999px;font-weight:800;box-shadow:0 8px 22px #0002}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a href="../index.html">Back</a><h1>Mini Town</h1><button id="reset">Reset</button></div>
+<section class="world" id="world"><div class="bubble">Drag characters and props around the town</div><div class="house"><div class="door"></div></div><div class="shop"></div><div class="park"></div><div class="item" style="left:45%;top:45%">🧒</div><div class="item" style="left:55%;top:50%">👧</div><div class="item" style="left:66%;top:58%">🐶</div><div class="item" style="left:30%;top:60%">⚽</div><div class="item" style="left:74%;top:34%">🍦</div><div class="item" style="left:18%;top:48%">🎈</div></section>
+<p class="hint">Make your own scene: put people in the house, park, or snack shop.</p>
+</main>
+<script>
+const world=document.getElementById('world');let drag=null,dx=0,dy=0;
+function start(e){const t=e.target;if(!t.classList.contains('item'))return;drag=t;const p=e.touches?e.touches[0]:e;const r=t.getBoundingClientRect();dx=p.clientX-r.left;dy=p.clientY-r.top;t.style.zIndex=Date.now();}
+function move(e){if(!drag)return;e.preventDefault();const p=e.touches?e.touches[0]:e;const wr=world.getBoundingClientRect();const x=Math.max(0,Math.min(wr.width-drag.offsetWidth,p.clientX-wr.left-dx));const y=Math.max(0,Math.min(wr.height-drag.offsetHeight,p.clientY-wr.top-dy));drag.style.left=x+'px';drag.style.top=y+'px';}
+function end(){drag=null;}
+world.addEventListener('mousedown',start);window.addEventListener('mousemove',move);window.addEventListener('mouseup',end);world.addEventListener('touchstart',start,{passive:false});window.addEventListener('touchmove',move,{passive:false});window.addEventListener('touchend',end);
+document.getElementById('reset').onclick=()=>location.reload();
+</script>
+</body>
+</html>
