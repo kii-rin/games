@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Island Cup Chase</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(#60c9ff,#fff0a8);font-family:Arial,sans-serif;color:#17324d}main{text-align:center;width:min(94vw,780px)}h1{margin:10px 0 4px}.bar{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:10px 0}.pill,a,button{background:white;color:#17324d;border:0;border-radius:999px;padding:9px 14px;font-weight:800;text-decoration:none;box-shadow:0 2px 9px rgba(0,0,0,.13)}button{cursor:pointer}.game{position:relative;width:min(94vw,780px);height:520px;margin:auto;overflow:hidden;border-radius:28px;border:6px solid white;background:linear-gradient(#54c8ff 0 32%,#fff4a5 32% 45%,#39bd6b 45%);box-shadow:0 10px 30px rgba(0,0,0,.18);touch-action:none}.runner,.pig,.cup,.heart,.rock{position:absolute;display:grid;place-items:center;border-radius:50%;user-select:none}.runner{width:54px;height:54px;background:#ffb35a;border:4px solid #9a4e13;font-size:29px;z-index:4}.pig{width:42px;height:42px;background:#ffc4d9;border:4px solid #d94f8c;font-size:24px;z-index:3}.cup{width:38px;height:38px;background:#fff;border:4px solid #9fd3ff;font-size:22px;z-index:2;animation:spin 1s linear infinite}.heart{width:30px;height:30px;background:#fff;border:3px solid #ff6b9d;font-size:18px}.rock{width:45px;height:35px;background:#777;border-radius:40% 50% 45% 55%;border:3px solid #555}.msg{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(255,255,255,.94);border-radius:18px;padding:10px 14px;font-weight:800;min-width:280px}.pad{display:none;grid-template-columns:repeat(3,58px);gap:8px;justify-content:center;margin-top:12px}.pad button{height:50px}.up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:700px){.game{height:440px}.pad{display:grid}}
+</style>
+</head>
+<body>
+<main>
+<h1>Island Cup Chase</h1>
+<div class="bar"><a href="../index.html">Back</a><span class="pill">Cups: <span id="score">0</span>/8</span><span class="pill">Buddy Hearts: <span id="hearts">0</span></span><button id="restart">Restart</button></div>
+<div class="game" id="game"><div class="runner" id="runner">🏃</div><div class="pig" id="pig">🐷</div><div class="msg" id="msg">Catch the rolling coconut cups with your pig buddy!</div></div>
+<p>Move with WASD, arrow keys, or buttons. Grab cups and hearts. Dodge rocks.</p>
+<div class="pad"><button class="up" data-d="up">↑</button><button class="left" data-d="left">←</button><button class="down" data-d="down">↓</button><button class="right" data-d="right">→</button></div>
+</main>
+<script>
+const game=document.getElementById('game'),runner=document.getElementById('runner'),pig=document.getElementById('pig'),scoreEl=document.getElementById('score'),heartEl=document.getElementById('hearts'),msg=document.getElementById('msg');
+const W=()=>game.clientWidth,H=()=>game.clientHeight;let x=70,y=300,px=30,py=330,score=0,hearts=0,won=false;const keys={};let cups=[],rocks=[],heartEls=[];
+function make(cls,txt,l,t){const e=document.createElement('div');e.className=cls;e.textContent=txt;e.style.left=l+'px';e.style.top=t+'px';game.appendChild(e);return e}
+function hit(a,b,p=0){const ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();return ar.left<br.right-p&&ar.right>br.left+p&&ar.top<br.bottom-p&&ar.bottom>br.top+p}
+function reset(){x=70;y=300;px=30;py=330;score=0;hearts=0;won=false;scoreEl.textContent=0;heartEl.textContent=0;cups.forEach(e=>e.remove());rocks.forEach(e=>e.remove());heartEls.forEach(e=>e.remove());cups=[];rocks=[];heartEls=[];for(let i=0;i<8;i++)cups.push(make('cup','🥥',150+i*70,100+(i%3)*90));for(let i=0;i<6;i++)rocks.push(make('rock','',115+i*105,250+(i%2)*80));for(let i=0;i<5;i++)heartEls.push(make('heart','💗',90+i*125,410-(i%2)*55));msg.textContent='Catch the rolling coconut cups with your pig buddy!';place()}
+function place(){runner.style.left=x+'px';runner.style.top=y+'px';pig.style.left=px+'px';pig.style.top=py+'px'}
+function loop(){let vx=0,vy=0;if(keys.a||keys.ArrowLeft)vx=-4;if(keys.d||keys.ArrowRight)vx=4;if(keys.w||keys.ArrowUp)vy=-4;if(keys.s||keys.ArrowDown)vy=4;x=Math.max(0,Math.min(W()-54,x+vx));y=Math.max(58,Math.min(H()-54,y+vy));px+=(x-44-px)*.08;py+=(y+18-py)*.08;place();cups.forEach((c,i)=>{let l=parseFloat(c.style.left)+Math.sin(Date.now()/450+i)*1.6;c.style.left=l+'px';if(l<0)c.style.left=W()-40+'px';if(l>W()-38)c.style.left='0px'});cups.slice().forEach(c=>{if(hit(runner,c,6)||hit(pig,c,6)){score++;scoreEl.textContent=score;msg.textContent='Cup caught! Keep the island race going!';cups=cups.filter(v=>v!==c);c.remove();if(score===8){won=true;msg.textContent='You caught every cup! Island picnic time! 🎉'}}});heartEls.slice().forEach(h=>{if(hit(runner,h,4)||hit(pig,h,4)){hearts++;heartEl.textContent=hearts;msg.textContent='Your pig buddy found a friendship heart!';heartEls=heartEls.filter(v=>v!==h);h.remove()}});rocks.forEach((r,i)=>{r.style.top=(250+(i%2)*80+Math.sin(Date.now()/600+i)*18)+'px';if(!won&&(hit(runner,r,10)||hit(pig,r,10))){x=70;y=300;msg.textContent='Bump! A beach rock slowed the chase. Try again!'}});requestAnimationFrame(loop)}
+document.addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true});document.addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});document.querySelectorAll('[data-d]').forEach(b=>{const m={up:'w',down:'s',left:'a',right:'d'};b.onpointerdown=()=>keys[m[b.dataset.d]]=true;b.onpointerup=b.onpointerleave=()=>keys[m[b.dataset.d]]=false});document.getElementById('restart').onclick=reset;reset();loop();
+</script>
+</body>
+</html>
