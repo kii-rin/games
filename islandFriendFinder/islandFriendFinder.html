@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Island Friend Finder</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(#82d9ff,#fff4b8);font-family:Arial,sans-serif;color:#123}main{width:min(94vw,760px);text-align:center}h1{margin:10px 0 4px}.bar{display:flex;gap:10px;justify-content:space-between;align-items:center;margin:10px 0;flex-wrap:wrap}.pill,a,button{border:0;border-radius:999px;background:#fff;color:#123;padding:9px 14px;font-weight:700;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.12)}button{cursor:pointer}.game{position:relative;margin:auto;width:min(94vw,760px);height:520px;overflow:hidden;border:6px solid #fff;border-radius:28px;background:linear-gradient(#51c2ff 0 38%,#ffe17b 38% 45%,#54c66a 45%);box-shadow:0 10px 30px rgba(0,0,0,.18);touch-action:none}.hero,.friend,.cloud,.shell{position:absolute;display:grid;place-items:center;border-radius:50%;user-select:none}.hero{width:54px;height:54px;background:#49a7ff;border:4px solid #1c5ca8;font-size:30px;z-index:3;box-shadow:0 4px 0 #144274}.friend{width:48px;height:48px;background:#fff;border:4px solid #ff8cc6;font-size:27px;z-index:2;animation:bob 1.8s infinite ease-in-out}.cloud{width:62px;height:44px;border-radius:30px;background:#777;color:white;font-size:24px;z-index:2}.shell{width:30px;height:30px;background:#ffe0f2;border:3px solid #d85ba2;font-size:18px}.msg{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(255,255,255,.92);padding:10px 14px;border-radius:16px;font-weight:700;min-width:270px}.pad{display:none;grid-template-columns:repeat(3,58px);gap:8px;justify-content:center;margin-top:12px}.pad button{height:50px}.up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}@keyframes bob{50%{transform:translateY(-8px)}}@media(max-width:700px){.game{height:440px}.pad{display:grid}}
+</style>
+</head>
+<body>
+<main>
+<h1>Island Friend Finder</h1>
+<div class="bar"><a href="../index.html">Back</a><span class="pill">Friends: <span id="score">0</span>/6</span><span class="pill">Shells: <span id="shells">0</span></span><button id="restart">Restart</button></div>
+<div class="game" id="game"><div class="hero" id="hero">👽</div><div class="msg" id="msg">Find every friend around the sunny island!</div></div>
+<p>Use WASD, arrow keys, or the buttons. Find all friends and collect shells.</p>
+<div class="pad"><button class="up" data-d="up">↑</button><button class="left" data-d="left">←</button><button class="down" data-d="down">↓</button><button class="right" data-d="right">→</button></div>
+</main>
+<script>
+const game=document.getElementById('game'),hero=document.getElementById('hero'),scoreEl=document.getElementById('score'),shellEl=document.getElementById('shells'),msg=document.getElementById('msg');
+const W=()=>game.clientWidth,H=()=>game.clientHeight;let x=80,y=300,vx=0,vy=0,score=0,shells=0,won=false;const keys={};
+const friends=[['🌺','Poppy the dancer'],['🐢','Tiko the turtle'],['🧸','Button the toy'],['👧','Maya the helper'],['🌈','Sunny the rainbow pal'],['⭐','Nova, a new friend']];
+function make(c,cls,l,t,name){const e=document.createElement('div');e.className=cls;e.textContent=c;e.style.left=l+'px';e.style.top=t+'px';e.dataset.name=name||'';game.appendChild(e);return e}
+let friendEls=[],clouds=[],shellEls=[];
+function reset(){x=80;y=300;score=0;shells=0;won=false;scoreEl.textContent=0;shellEl.textContent=0;friendEls.forEach(e=>e.remove());clouds.forEach(e=>e.remove());shellEls.forEach(e=>e.remove());friendEls=[];clouds=[];shellEls=[];friends.forEach((f,i)=>friendEls.push(make(f[0],'friend',130+i*92,90+(i%2)*95,f[1])));for(let i=0;i<5;i++)clouds.push(make('☁','cloud',120+i*120,245+(i%2)*80));for(let i=0;i<9;i++)shellEls.push(make('🐚','shell',60+i*75,420-(i%3)*45));msg.textContent='Find every friend around the sunny island!';place()}
+function place(){hero.style.left=x+'px';hero.style.top=y+'px'}
+function hit(a,b,pad=0){const ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();return ar.left<br.right-pad&&ar.right>br.left+pad&&ar.top<br.bottom-pad&&ar.bottom>br.top+pad}
+function loop(){vx=vy=0;if(keys.ArrowLeft||keys.a)vx=-4;if(keys.ArrowRight||keys.d)vx=4;if(keys.ArrowUp||keys.w)vy=-4;if(keys.ArrowDown||keys.s)vy=4;x=Math.max(0,Math.min(W()-54,x+vx));y=Math.max(70,Math.min(H()-54,y+vy));place();friendEls.slice().forEach(e=>{if(hit(hero,e,8)){score++;scoreEl.textContent=score;msg.textContent=e.dataset.name+' joined your island family!';friendEls=friendEls.filter(f=>f!==e);e.remove();if(score===6){won=true;msg.textContent='You found everyone! Friendship party unlocked! 🎉'}}});shellEls.slice().forEach(e=>{if(hit(hero,e,4)){shells++;shellEl.textContent=shells;shellEls=shellEls.filter(s=>s!==e);e.remove()}});clouds.forEach((c,i)=>{let left=parseFloat(c.style.left)+Math.sin(Date.now()/700+i)*.8;c.style.left=((left+W())%W())+'px';if(hit(hero,c,10)&&!won){x=80;y=300;msg.textContent='A grumpy cloud blew you back. Keep helping!'}});requestAnimationFrame(loop)}
+document.addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true});document.addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});document.querySelectorAll('[data-d]').forEach(b=>{b.onpointerdown=()=>keys[{up:'w',down:'s',left:'a',right:'d'}[b.dataset.d]]=true;b.onpointerup=b.onpointerleave=()=>keys[{up:'w',down:'s',left:'a',right:'d'}[b.dataset.d]]=false});document.getElementById('restart').onclick=reset;reset();loop();
+</script>
+</body>
+</html>
