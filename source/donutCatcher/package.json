@@ -2,7 +2,15 @@
   "name": "flowerpunch-donut-catcher",
   "private": true,
   "type": "module",
-  "scripts": { "build": "node build.mjs", "test": "node --test engine.test.mjs" },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "esbuild": "0.25.9" }
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test engine.test.mjs"
+  },
+  "dependencies": {
+    "svelte": "5.38.10",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.9"
+  }
 }

@@ -1,0 +1,83 @@
+[
+  {
+    "name": "logo",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_17_51 PM.png",
+    "sha256": "ee48d631af74c550429619f146f9736dc8f4e03e909b6f739e1484993520d51f",
+    "file": "assets/logo.webp",
+    "width": 900,
+    "height": 675,
+    "bytes": 110688
+  },
+  {
+    "name": "donut-strawberry",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_03 PM (2).png",
+    "sha256": "63d60e9cdf3047e25c3118768ce797ed1dc16a9b43012176810c18a75ef6602a",
+    "file": "assets/donut-strawberry.webp",
+    "width": 640,
+    "height": 640,
+    "bytes": 69466
+  },
+  {
+    "name": "donut-blueberry",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_03 PM (3).png",
+    "sha256": "ffa11bcf4949d1c6534fdfe396dd40af3e252cd82f740ebac6b5574fef4e27b1",
+    "file": "assets/donut-blueberry.webp",
+    "width": 640,
+    "height": 640,
+    "bytes": 89068
+  },
+  {
+    "name": "donut-chocolate",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_04 PM (4).png",
+    "sha256": "9a8d1a180fa680bd8370d38c398b717a51bd2d1e101aab5689b6c987e7f3333b",
+    "file": "assets/donut-chocolate.webp",
+    "width": 640,
+    "height": 640,
+    "bytes": 75354
+  },
+  {
+    "name": "donut-vanilla",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_04 PM (5).png",
+    "sha256": "649a113ac290526dec47aac862fb4ac262ef097e277541f9264909645a0f6a40",
+    "file": "assets/donut-vanilla.webp",
+    "width": 640,
+    "height": 640,
+    "bytes": 69564
+  },
+  {
+    "name": "basket",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_04 PM (6).png",
+    "sha256": "d8f1824bcb44efdec6e9305a174891edddbf6b6e189d8513f7d6b72da6369f30",
+    "file": "assets/basket.webp",
+    "width": 900,
+    "height": 900,
+    "bytes": 127716
+  },
+  {
+    "name": "hand-left",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_05 PM (7).png",
+    "sha256": "61242ef09a93f161781bc7801443e1e116025fca419acfec916a3e799e1516ce",
+    "file": "assets/hand-left.webp",
+    "width": 800,
+    "height": 800,
+    "bytes": 57610
+  },
+  {
+    "name": "hand-right",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_05 PM (8).png",
+    "sha256": "8cba32b28568ee9f7c7c2474cd0ff8dadd5c5753d381a2778511a9bbbf3d5da4",
+    "file": "assets/hand-right.webp",
+    "width": 800,
+    "height": 800,
+    "bytes": 54136
+  },
+  {
+    "name": "background",
+    "source": "ChatGPT Image Sep 1, 2026 at 02_18_06 PM (9).png",
+    "sha256": "6e0fdfe747507783ad324e714ba8bf0f10e4fbd21296f3bdbd67b392a3e82bde",
+    "file": "assets/background.webp",
+    "width": 1672,
+    "height": 941,
+    "bytes": 169122
+  }
+]

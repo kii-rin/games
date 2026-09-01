@@ -1,0 +1,11 @@
+import logo from './assets/logo.webp';
+import strawberry from './assets/donut-strawberry.webp';
+import blueberry from './assets/donut-blueberry.webp';
+import chocolate from './assets/donut-chocolate.webp';
+import vanilla from './assets/donut-vanilla.webp';
+import basket from './assets/basket.webp';
+import handLeft from './assets/hand-left.webp';
+import handRight from './assets/hand-right.webp';
+import background from './assets/background.webp';
+import turtle from './assets/turtle.webp';
+export const art={logo,donuts:[strawberry,blueberry,chocolate,vanilla],basket,handLeft,handRight,background,turtle};

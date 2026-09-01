@@ -34,3 +34,13 @@ test('restart clears all state while retaining responsive lane width',()=>{
  assert.equal(g.state.score,0);assert.equal(g.state.level,1);assert.equal(g.state.time,60);assert.deepEqual(g.state.objects,[]);assert.equal(g.state.halfWidth,3);
  g.state.targetX=100;g.update(.2);assert.ok(g.state.x<=1.95);
 });
+test('spawns only the four supplied donut flavors, including upper random bound',()=>{
+ const seen=new Set();
+ for(const value of [0,.249,.25,.499,.5,.749,.75,.999999]){
+  const sequence=[.5,.5,.5,value,.5];
+  const g=createGame(()=>sequence.shift()??.5);g.start();g.state.spawn=0;
+  const event=g.update(.01).find(e=>e.type==='spawn');
+  assert.equal(event.object.type,'donut');assert.ok(event.object.variant>=0&&event.object.variant<4);seen.add(event.object.variant);
+ }
+ assert.deepEqual([...seen],[0,1,2,3]);
+});

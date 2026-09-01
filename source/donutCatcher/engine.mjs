@@ -21,7 +21,7 @@ export function createGame(random = Math.random) {
       const type=random()<0.23?'turtle':'donut';
       const object={id:state.nextId++,type,x:(random()*2-1)*(state.halfWidth-0.8),
         y:10.8,speed:2.65+Math.min(state.level-1,8)*0.22+random()*0.7,
-        variant:Math.floor(random()*5),rotation:random()*6.28};
+        variant:Math.floor(random()*4),rotation:random()*6.28};
       state.objects.push(object);events.push({type:'spawn',object});
       state.spawn+=Math.max(0.42,0.79-(state.level-1)*0.035);
     }
