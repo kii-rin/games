@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff6aa2"><meta name="description" content="Catch colorful donuts, dodge tiny turtles. A playful 3D FlowerPunch game.">
+<title>Donut Catcher · FlowerPunch</title><style>/* INLINE_CSS */</style></head>
+<body>
+<main id="game" aria-label="Donut Catcher game">
+ <canvas id="scene" tabindex="0" aria-label="Move the basket with left and right arrow keys, A and D, or drag across the play area."></canvas>
+ <header class="topbar">
+  <a class="back" href="../index.html" aria-label="Back to games"><span aria-hidden="true">←</span><span class="back-label">Games</span></a>
+  <div class="wordmark"><span>DONUT</span><strong>CATCHER</strong></div>
+  <div class="stats"><div class="stat score"><span>SCORE</span><strong id="score">0</strong></div><div class="stat"><span>TIME</span><strong id="time">60<span>s</span></strong></div></div>
+ </header>
+ <div id="level-toast" role="status"></div>
+ <section id="welcome" class="panel" aria-labelledby="welcome-title">
+  <span class="eyebrow">FRESH FROM THE SKY</span><h1 id="welcome-title">Ready, set,<br><em>donut!</em></h1>
+  <div class="rules"><span><span class="donut-symbol" aria-hidden="true">🍩</span><b>+1</b> Catch donuts</span><span><img class="turtle-icon" src="TURTLE_DATA_URL" alt=""><b>−1</b> Dodge turtles</span></div>
+  <button id="start" class="primary" disabled>Preparing the bakery…</button>
+  <p class="hint">60 seconds. How many can you catch?</p>
+ </section>
+ <section id="result" class="panel" aria-labelledby="result-title" hidden>
+  <span class="eyebrow">THAT’S A BATCH!</span><h2 id="result-title">Sweet catch.</h2><strong id="final-score">0</strong><p id="summary"></p>
+  <button id="again" class="primary">One more round <span aria-hidden="true">↗</span></button><p class="hint" id="best-result"></p>
+ </section>
+ <section id="resume-panel" class="panel compact" hidden><h2>Take your time.</h2><button id="resume" class="primary">Keep catching</button></section>
+ <section id="error" class="panel compact" role="alert" hidden><h2>A little oven trouble.</h2><p id="error-message"></p><button id="reload" class="primary">Try again</button></section>
+ <div id="feedback" aria-hidden="true"></div>
+ <footer><span class="friend"><i></i><span id="friend-name">Peanut the Hamster</span><b id="level">01</b></span><span class="controls"><kbd>←</kbd><kbd>→</kbd><span>or drag to move</span></span><span class="best">BEST <b id="best">0</b></span></footer>
+</main>
+<script>/* INLINE_JS */</script>
+</body></html>
