@@ -1,0 +1,32 @@
+{
+  "pack": "hide-seek-forest-lowpoly-pass-01",
+  "coordinateSystem": "Y-up; meters; origin at ground contact",
+  "style": "chunky low-poly, flat-shaded, bright forest palette inspired by the supplied Hide & Seek card",
+  "performance": {
+    "target": "iPad Safari / mobile WebGL2",
+    "principles": [
+      "small GLBs",
+      "no texture lookups",
+      "simple geometry",
+      "simple colliders",
+      "instance repeated props",
+      "avoid per-prop dynamic shadows"
+    ],
+    "recommendedDprCap": 1.5,
+    "shadowTip": "One directional light; only hero objects cast, static props receive or use blob shadows."
+  },
+  "assets": [
+    {"id":"tree_oak","triangles":268,"vertices":142,"bounds_m":[2.44,3.362,1.9],"category":"cover","collider":{"type":"cylinder","radius":0.42,"height":2.2},"hide_anchor":[0,0,-0.72],"suggested_instances":16},
+    {"id":"tree_pine","triangles":112,"vertices":64,"bounds_m":[1.806,3.52,1.852],"category":"cover","collider":{"type":"cylinder","radius":0.38,"height":2.2},"hide_anchor":[0,0,-0.62],"suggested_instances":12},
+    {"id":"bush_round","triangles":240,"vertices":126,"bounds_m":[2.09,1.371,1.57],"category":"cover","collider":{"type":"cylinder","radius":0.75,"height":1.15},"hide_anchor":[0,0,-0.72],"suggested_instances":24},
+    {"id":"bush_tall","triangles":240,"vertices":126,"bounds_m":[1.265,2.015,0.928],"category":"cover","collider":{"type":"cylinder","radius":0.55,"height":1.8},"hide_anchor":[0,0,-0.62],"suggested_instances":18},
+    {"id":"rock_cluster","triangles":240,"vertices":126,"bounds_m":[1.762,0.893,1.304],"category":"cover","collider":{"type":"box","size":[1.45,0.78,1.15]},"hide_anchor":[0,0,-0.68],"suggested_instances":14},
+    {"id":"tree_stump","triangles":112,"vertices":68,"bounds_m":[1.26,0.703,1.26],"category":"cover-small","collider":{"type":"cylinder","radius":0.5,"height":0.72},"suggested_instances":8},
+    {"id":"fallen_log","triangles":120,"vertices":68,"bounds_m":[1.885,0.73,0.6],"category":"cover","collider":{"type":"box","size":[1.9,0.68,0.72]},"hide_anchor":[0,0,-0.52],"suggested_instances":6},
+    {"id":"mushroom_cluster","triangles":312,"vertices":168,"bounds_m":[0.846,0.449,0.639],"category":"decor","collider":null,"suggested_instances":18},
+    {"id":"flower_patch","triangles":560,"vertices":336,"bounds_m":[0.87,0.378,0.632],"category":"decor","collider":null,"suggested_instances":20},
+    {"id":"fern_patch","triangles":84,"vertices":56,"bounds_m":[0.813,0.297,0.799],"category":"decor","collider":null,"suggested_instances":18},
+    {"id":"reed_clump","triangles":172,"vertices":102,"bounds_m":[0.652,1.02,0.217],"category":"decor","collider":null,"suggested_instances":10},
+    {"id":"friend_placeholder","triangles":152,"vertices":90,"bounds_m":[0.66,1.681,0.66],"category":"test-character","collider":{"type":"capsule","radius":0.25,"height":1.35},"suggested_instances":1,"note":"Non-rigged blockout for scale/camera/seek testing; replace with final character GLB later."}
+  ]
+}
