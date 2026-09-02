@@ -1,21 +1,134 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>FlowerPunch Games</title><style>*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold",system-ui,sans-serif;background:#a56fd0;color:#fff}body{min-height:100vh;overflow:hidden}.hub{min-height:100vh;position:relative;overflow:hidden;background:linear-gradient(rgba(64,28,91,.05),rgba(41,18,65,.28)),url('assets/background.webp') center/cover no-repeat}.hub:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,transparent 0 35%,rgba(33,14,52,.2) 75%,rgba(20,8,35,.5) 100%);pointer-events:none}.brand{position:absolute;left:20px;top:17px;z-index:10;display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:18px;background:rgba(28,16,48,.55);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(12px);font-weight:900}.brand i{width:11px;height:11px;border-radius:50%;background:#ff75b7;box-shadow:0 0 14px #ff88c3}.hero{position:relative;z-index:4;text-align:center;padding-top:54px;pointer-events:none}.welcome{font-size:clamp(13px,1.4vw,19px);font-weight:1000;letter-spacing:1.6px;text-shadow:0 3px 9px #3c2257}.logo{font-size:clamp(46px,6vw,80px);font-weight:1000;letter-spacing:-4px;line-height:.95;text-transform:uppercase;color:white;text-shadow:0 5px 0 #743870,0 11px 20px rgba(45,18,72,.42)}.logo span{background:linear-gradient(#ffd5eb,#ff7dbb 48%,#e94ca5);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.28)}.stage{position:relative;z-index:5;max-width:1320px;height:610px;margin:-2px auto 0;padding:0 34px;display:flex;flex-direction:column;justify-content:center}.carousel{height:455px;position:relative;perspective:1400px;user-select:none;-webkit-user-select:none;touch-action:pan-y pinch-zoom}.carousel.dragging .card{transition:none;cursor:grabbing}.card,.card img{-webkit-user-drag:none;-webkit-touch-callout:none}.card{position:absolute;left:50%;top:50%;width:225px;aspect-ratio:2/3;border-radius:27px;overflow:hidden;background:#3a275b;transform-origin:center;transition:transform .32s cubic-bezier(.2,.75,.2,1),opacity .28s,filter .28s;box-shadow:0 22px 44px rgba(40,14,67,.38),inset 0 0 0 3px rgba(255,255,255,.8);outline:none;text-decoration:none;cursor:pointer}.card img{width:100%;height:100%;display:block;object-fit:cover;pointer-events:none}.card:after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 3px rgba(255,255,255,.76);pointer-events:none}.card.active{box-shadow:0 28px 58px rgba(43,14,75,.5),0 0 34px 9px rgba(255,111,190,.68),inset 0 0 0 4px white;z-index:20}.card.active:after{box-shadow:inset 0 0 0 4px #fff}.arrow{position:absolute;top:46%;transform:translateY(-50%);z-index:30;width:52px;height:70px;border:1px solid rgba(255,255,255,.45);border-radius:19px;background:rgba(31,18,54,.6);color:#fff;font-size:33px;cursor:pointer;backdrop-filter:blur(10px)}.arrow:hover{background:rgba(91,52,150,.88)}.arrow.left{left:8px}.arrow.right{right:8px}.dots{display:flex;justify-content:center;align-items:center;gap:9px;height:30px}.dot{width:10px;height:10px;border:0;border-radius:50%;background:rgba(230,220,255,.48);padding:0;cursor:pointer}.dot.active{width:16px;height:16px;background:#fff;box-shadow:0 0 0 4px #ff65ae,0 0 18px #ff92c9}.label{text-align:center;height:26px;font-size:14px;font-weight:1000;text-shadow:0 2px 8px #3d2358}@media(max-width:760px){body{overflow:auto}.brand{top:10px;left:10px;font-size:13px}.hero{padding-top:65px}.logo{font-size:45px;letter-spacing:-2px}.stage{height:520px;padding:0 2px}.carousel{height:410px}.card{width:172px;border-radius:21px}.arrow{display:none}.dots{gap:7px}.dot{width:8px;height:8px}.dot.active{width:13px;height:13px}}@media(prefers-reduced-motion:reduce){.card{transition:none}}</style></head><body><main class="hub"><div class="brand"><i></i>FlowerPunch</div><section class="hero"><div class="welcome">WELCOME TO</div><div class="logo"><span>FLOWER</span>PUNCH!</div></section><section class="stage"><button class="arrow left" id="prev" type="button" aria-label="Previous game">‹</button><div class="carousel" id="carousel"></div><button class="arrow right" id="next" type="button" aria-label="Next game">›</button><div class="dots" id="dots"></div><div class="label" id="label"></div></section></main><script>const games=[{name:'Squish Dumpling',image:'assets/cards/squish-dumpling.webp',href:'squishyDumpling/squishyDumpling.html'},{name:'Cosmic Hop',image:'assets/cards/cosmic-hop.webp',href:'cosmicHop/cosmicHop.html'},{name:'Donut Catcher',image:'assets/cards/donut-catcher.webp',href:'donutCatcher/donutCatcher.html'},{name:'Hide and Seek',image:'assets/cards/hide-and-seek.webp',href:'hideAndSeek/hideAndSeek.html'},{name:'Ice Cream Unicorn',image:'assets/cards/ice-cream-unicorn.webp',href:'iceCreamUnicorn/iceCreamUnicorn.html'},{name:'Island Cup Chase',image:'assets/cards/island-cup-chase.webp',href:'islandCupChase/islandCupChase.html'},{name:'Island Friend Finder',image:'assets/cards/island-friend-finder.webp',href:'islandFriendFinder/islandFriendFinder.html'},{name:'Mini Town',image:'assets/cards/mini-town.webp',href:'miniTown/miniTown.html'},{name:'Snake',image:'assets/cards/snake.webp',href:'snake/snake.html'},{name:'Song Maker',image:'assets/cards/song-maker.webp',href:'songMaker/songMaker.html'},{name:'Demon Hunters',image:'assets/cards/demon-hunters.webp',href:'demonHunters/demonHunters.html'}];const carousel=document.getElementById('carousel'),dots=document.getElementById('dots'),label=document.getElementById('label');let active=0;const cards=[];function wrap(n){return(n%games.length+games.length)%games.length}function delta(i,a){let d=i-a;if(d>games.length/2)d-=games.length;if(d<-games.length/2)d+=games.length;return d}games.forEach((g,i)=>{const a=document.createElement('a');a.className='card';a.href=g.href;a.draggable=false;a.setAttribute('aria-label','Play '+g.name);const img=document.createElement('img');img.draggable=false;img.src=g.image;img.alt=g.name+' game card';a.appendChild(img);carousel.appendChild(a);cards.push(a);const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label','Select '+g.name);d.onclick=()=>{active=i;render()};dots.appendChild(d)});function render(dragOffset=0){cards.forEach((c,i)=>{const d=delta(i,active),ad=Math.abs(d);let x=0,s=1,r=0,o=1,z=10-ad;if(d===0){s=1.2;z=20}else if(ad===1){x=d*255;s=.92;r=d*-3}else if(ad===2){x=d*215;s=.78;r=d*-5;o=.96}else if(ad===3){x=d*180;s=.64;o=.38}else{o=0;s=.55;x=d*150}if(innerWidth<760){if(d===0)s=1.18;else if(ad===1){x=d*174;s=.88}else if(ad===2){x=d*148;s=.68;o=.32}else o=0}c.style.transform=`translate(-50%,-50%) translateX(${x+dragOffset}px) scale(${s}) rotateY(${r}deg)`;c.style.opacity=o;c.style.zIndex=z;c.style.pointerEvents=o>0?'auto':'none';c.classList.toggle('active',d===0);c.tabIndex=d===0?0:-1});[...dots.children].forEach((d,i)=>d.classList.toggle('active',i===active));label.textContent=games[active].name}function step(n){active=wrap(active+n);render()}document.getElementById('prev').onclick=()=>step(-1);document.getElementById('next').onclick=()=>step(1);document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)});carousel.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||Math.abs(e.deltaY)>15){e.preventDefault();step((e.deltaX||e.deltaY)>0?1:-1)}},{passive:false});
-/* Swiping moves the carousel; plain taps retain the anchors' native navigation. */
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FlowerPunch Games</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold",system-ui,sans-serif;background:#a56fd0;color:#fff}
+body{min-height:100vh;overflow:hidden}
+button,a{-webkit-tap-highlight-color:transparent}
+.hub{min-height:100vh;position:relative;overflow:hidden;background:linear-gradient(rgba(64,28,91,.05),rgba(41,18,65,.28)),url('assets/background.webp') center/cover no-repeat}
+.hub:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,transparent 0 35%,rgba(33,14,52,.2) 75%,rgba(20,8,35,.5) 100%);pointer-events:none}
+.brand{position:absolute;left:20px;top:17px;z-index:10;display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:18px;background:rgba(28,16,48,.55);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(12px);font-weight:900}
+.brand i{width:11px;height:11px;border-radius:50%;background:#ff75b7;box-shadow:0 0 14px #ff88c3}
+.hero{position:relative;z-index:4;text-align:center;padding-top:54px;pointer-events:none}
+.welcome{font-size:clamp(13px,1.4vw,19px);font-weight:1000;letter-spacing:1.6px;text-shadow:0 3px 9px #3c2257}
+.logo{font-size:clamp(46px,6vw,80px);font-weight:1000;letter-spacing:-4px;line-height:.95;text-transform:uppercase;color:white;text-shadow:0 5px 0 #743870,0 11px 20px rgba(45,18,72,.42)}
+.logo span{background:linear-gradient(#ffd5eb,#ff7dbb 48%,#e94ca5);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.28)}
+.stage{position:relative;z-index:5;max-width:1320px;height:610px;margin:-2px auto 0;padding:0 34px;display:flex;flex-direction:column;justify-content:center}
+.carousel{height:455px;position:relative;perspective:1400px;user-select:none;-webkit-user-select:none;touch-action:pan-y pinch-zoom}
+.carousel.dragging .card{transition:none;cursor:grabbing}
+.card,.card img{-webkit-user-drag:none;-webkit-touch-callout:none}
+.card{position:absolute;left:50%;top:50%;width:225px;aspect-ratio:2/3;border-radius:27px;overflow:hidden;background:#3a275b;transform-origin:center;transition:transform .32s cubic-bezier(.2,.75,.2,1),opacity .28s,filter .28s;box-shadow:0 22px 44px rgba(40,14,67,.38),inset 0 0 0 3px rgba(255,255,255,.8);outline:none;text-decoration:none;cursor:pointer}
+.card img{width:100%;height:100%;display:block;object-fit:cover;pointer-events:none}
+.card:after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 3px rgba(255,255,255,.76);pointer-events:none}
+.card.active{box-shadow:0 28px 58px rgba(43,14,75,.5),0 0 34px 9px rgba(255,111,190,.68),inset 0 0 0 4px white;z-index:20}
+.card.active:after{box-shadow:inset 0 0 0 4px #fff}
+.arrow{position:absolute;top:46%;transform:translateY(-50%);z-index:30;width:52px;height:70px;border:1px solid rgba(255,255,255,.45);border-radius:19px;background:rgba(31,18,54,.6);color:#fff;font-size:33px;cursor:pointer;backdrop-filter:blur(10px);touch-action:manipulation}
+.arrow:hover{background:rgba(91,52,150,.88)}
+.arrow.left{left:8px}.arrow.right{right:8px}
+.dots{display:flex;justify-content:center;align-items:center;gap:0;height:34px}
+.dot{position:relative;width:28px;height:32px;border:0;background:transparent;padding:0;cursor:pointer;touch-action:manipulation}
+.dot:before{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(230,220,255,.48);transition:width .18s,height .18s,background .18s,box-shadow .18s}
+.dot.active:before{width:16px;height:16px;background:#fff;box-shadow:0 0 0 4px #ff65ae,0 0 18px #ff92c9}
+.label{text-align:center;height:26px;font-size:14px;font-weight:1000;text-shadow:0 2px 8px #3d2358}
+@media(max-width:760px){
+ body{overflow:auto}
+ .brand{top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));font-size:13px}
+ .hero{padding-top:max(65px,calc(env(safe-area-inset-top) + 54px))}
+ .logo{font-size:45px;letter-spacing:-2px}
+ .stage{height:520px;padding:0 2px}
+ .carousel{height:410px}
+ .card{width:172px;border-radius:21px}
+ .arrow{display:block;top:47%;width:clamp(52px,15vw,72px);height:62%;border:0;border-radius:0;background:transparent;backdrop-filter:none;font-size:0;padding:0}
+ .arrow:hover{background:transparent}
+ .arrow.left{left:max(0px,env(safe-area-inset-left))}.arrow.right{right:max(0px,env(safe-area-inset-right))}
+ .arrow:after{position:absolute;top:50%;width:44px;height:44px;display:grid;place-items:center;transform:translateY(-50%);border-radius:50%;background:rgba(31,18,54,.34);border:1px solid rgba(255,255,255,.34);box-shadow:0 5px 16px rgba(33,14,52,.2);font-size:30px;line-height:1;color:#fff;transition:transform .12s ease,background .12s ease}
+ .arrow.left:after{content:"‹";left:4px}.arrow.right:after{content:"›";right:4px}
+ .arrow:active:after{transform:translateY(-50%) scale(.9);background:rgba(91,52,150,.78)}
+ .dots{height:36px}
+ .dot{width:24px;height:34px}
+ .dot:before{width:8px;height:8px}
+ .dot.active:before{width:13px;height:13px}
+}
+@media(prefers-reduced-motion:reduce){.card,.dot:before,.arrow:after{transition:none}}
+</style>
+</head>
+<body>
+<main class="hub">
+ <div class="brand"><i></i>FlowerPunch</div>
+ <section class="hero"><div class="welcome">WELCOME TO</div><div class="logo"><span>FLOWER</span>PUNCH!</div></section>
+ <section class="stage">
+  <button class="arrow left" id="prev" type="button" aria-label="Previous game">‹</button>
+  <div class="carousel" id="carousel" aria-label="Game carousel"></div>
+  <button class="arrow right" id="next" type="button" aria-label="Next game">›</button>
+  <div class="dots" id="dots"></div>
+  <div class="label" id="label" aria-live="polite"></div>
+ </section>
+</main>
+<script>
+const games=[
+{name:'Squish Dumpling',image:'assets/cards/squish-dumpling.webp',href:'squishyDumpling/squishyDumpling.html'},
+{name:'Cosmic Hop',image:'assets/cards/cosmic-hop.webp',href:'cosmicHop/cosmicHop.html'},
+{name:'Donut Catcher',image:'assets/cards/donut-catcher.webp',href:'donutCatcher/donutCatcher.html'},
+{name:'Hide and Seek',image:'assets/cards/hide-and-seek.webp',href:'hideAndSeek/hideAndSeek.html'},
+{name:'Ice Cream Unicorn',image:'assets/cards/ice-cream-unicorn.webp',href:'iceCreamUnicorn/iceCreamUnicorn.html'},
+{name:'Island Cup Chase',image:'assets/cards/island-cup-chase.webp',href:'islandCupChase/islandCupChase.html'},
+{name:'Island Friend Finder',image:'assets/cards/island-friend-finder.webp',href:'islandFriendFinder/islandFriendFinder.html'},
+{name:'Mini Town',image:'assets/cards/mini-town.webp',href:'miniTown/miniTown.html'},
+{name:'Snake',image:'assets/cards/snake.webp',href:'snake/snake.html'},
+{name:'Song Maker',image:'assets/cards/song-maker.webp',href:'songMaker/songMaker.html'},
+{name:'Demon Hunters',image:'assets/cards/demon-hunters.webp',href:'demonHunters/demonHunters.html'}
+];
+const carousel=document.getElementById('carousel'),dots=document.getElementById('dots'),label=document.getElementById('label');
+let active=0;const cards=[];
+function wrap(n){return(n%games.length+games.length)%games.length}
+function delta(i,a){let d=i-a;if(d>games.length/2)d-=games.length;if(d<-games.length/2)d+=games.length;return d}
+function selectGame(i){active=wrap(i);render()}
+games.forEach((g,i)=>{
+ const a=document.createElement('a');a.className='card';a.href=g.href;a.draggable=false;a.setAttribute('aria-label','Play '+g.name);
+ const img=document.createElement('img');img.draggable=false;img.src=g.image;img.alt=g.name+' game card';a.appendChild(img);carousel.appendChild(a);cards.push(a);
+ a.addEventListener('click',event=>{if(i!==active){event.preventDefault();selectGame(i)}});
+ const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label','Select '+g.name);d.onclick=()=>selectGame(i);dots.appendChild(d)
+});
+function render(dragOffset=0){
+ cards.forEach((c,i)=>{
+  const d=delta(i,active),ad=Math.abs(d);let x=0,s=1,r=0,o=1,z=10-ad;
+  if(d===0){s=1.2;z=20}else if(ad===1){x=d*255;s=.92;r=d*-3}else if(ad===2){x=d*215;s=.78;r=d*-5;o=.96}else if(ad===3){x=d*180;s=.64;o=.38}else{o=0;s=.55;x=d*150}
+  if(innerWidth<760){if(d===0)s=1.18;else if(ad===1){x=d*174;s=.88}else if(ad===2){x=d*148;s=.68;o=.32}else o=0}
+  c.style.transform=`translate(-50%,-50%) translateX(${x+dragOffset}px) scale(${s}) rotateY(${r}deg)`;
+  c.style.opacity=o;c.style.zIndex=z;c.style.pointerEvents=o>0?'auto':'none';c.classList.toggle('active',d===0);c.tabIndex=d===0?0:-1;
+  if(d===0)c.setAttribute('aria-current','true');else c.removeAttribute('aria-current');
+ });
+ [...dots.children].forEach((d,i)=>{d.classList.toggle('active',i===active);if(i===active)d.setAttribute('aria-current','true');else d.removeAttribute('aria-current')});
+ label.textContent=games[active].name
+}
+function step(n){selectGame(active+n)}
+document.getElementById('prev').onclick=()=>step(-1);
+document.getElementById('next').onclick=()=>step(1);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)});
+carousel.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||Math.abs(e.deltaY)>15){e.preventDefault();step((e.deltaX||e.deltaY)>0?1:-1)}},{passive:false});
+
+/* Keep taps native, but make iPhone thumb swipes forgiving and lock the pointer only after horizontal intent is clear. */
 let swipe=null,ignoreSwipeClickUntil=0;
 carousel.addEventListener('dragstart',event=>event.preventDefault());
 carousel.addEventListener('pointerdown',event=>{
- if(!event.isPrimary){cancelSwipe();return;}
+ if(!event.isPrimary){cancelSwipe();return}
  if(event.button!==0||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
  cancelSwipe();ignoreSwipeClickUntil=0;
  swipe={id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now(),horizontal:false,dx:0};
- // Do not capture the pointer or cancel pointerdown: a tap must remain a normal link click.
 });
 window.addEventListener('pointermove',event=>{
  if(!swipe||event.pointerId!==swipe.id)return;
- const dx=event.clientX-swipe.x,dy=event.clientY-swipe.y;
+ const dx=event.clientX-swipe.x,dy=event.clientY-swipe.y,ax=Math.abs(dx),ay=Math.abs(dy);
  if(!swipe.horizontal){
-  if(Math.max(Math.abs(dx),Math.abs(dy))<10)return;
-  if(Math.abs(dy)>=Math.abs(dx)){swipe=null;return;}
+  if(Math.max(ax,ay)<7)return;
+  if(ay>ax*1.4){swipe=null;return}
+  if(ax<ay&&Math.max(ax,ay)<16)return;
   swipe.horizontal=true;carousel.classList.add('dragging');
+  try{carousel.setPointerCapture(event.pointerId)}catch(_){ }
  }
  swipe.dx=dx;
  if(event.cancelable)event.preventDefault();
@@ -25,25 +138,25 @@ window.addEventListener('pointermove',event=>{
 function finishSwipe(event,cancelled=false){
  if(!swipe||(event&&event.pointerId!==swipe.id))return;
  const gesture=swipe;swipe=null;carousel.classList.remove('dragging');
+ if(gesture.horizontal){try{if(carousel.hasPointerCapture(gesture.id))carousel.releasePointerCapture(gesture.id)}catch(_){ }}
  if(!gesture.horizontal)return;
- // Suppress only the click produced by this completed drag. The next pointerdown resets this.
- ignoreSwipeClickUntil=performance.now()+650;
- const dx=cancelled?gesture.dx:event.clientX-gesture.x;
+ ignoreSwipeClickUntil=performance.now()+550;
+ const dx=cancelled?gesture.dx:(event?event.clientX-gesture.x:gesture.dx);
  const elapsed=Math.max(1,performance.now()-gesture.time);
- const distance=Math.min(64,carousel.clientWidth*.12);
- const moved=Math.abs(dx)>=distance||(Math.abs(dx)>=24&&Math.abs(dx)/elapsed>.45);
+ const distance=Math.max(26,Math.min(42,carousel.clientWidth*.075));
+ const moved=Math.abs(dx)>=distance||(Math.abs(dx)>=16&&Math.abs(dx)/elapsed>.22);
  if(!cancelled&&moved)step(dx<0?1:-1);else render();
 }
-function cancelSwipe(){finishSwipe(null,true);}
+function cancelSwipe(){finishSwipe(null,true)}
 window.addEventListener('pointerup',event=>finishSwipe(event));
 window.addEventListener('pointercancel',event=>finishSwipe(event,true));
 window.addEventListener('blur',cancelSwipe);
 carousel.addEventListener('click',event=>{
- if(event.detail!==0&&performance.now()<ignoreSwipeClickUntil){
-  ignoreSwipeClickUntil=0;event.preventDefault();event.stopImmediatePropagation();
- }
+ if(event.detail!==0&&performance.now()<ignoreSwipeClickUntil){ignoreSwipeClickUntil=0;event.preventDefault();event.stopImmediatePropagation()}
 },true);
-window.addEventListener('pageshow',()=>{swipe=null;ignoreSwipeClickUntil=0;carousel.classList.remove('dragging');render();});
-addEventListener('resize',()=>{cancelSwipe();render();});
+window.addEventListener('pageshow',()=>{swipe=null;ignoreSwipeClickUntil=0;carousel.classList.remove('dragging');render()});
+addEventListener('resize',()=>{cancelSwipe();render()});
 render();
-</script></body></html>
+</script>
+</body>
+</html>
