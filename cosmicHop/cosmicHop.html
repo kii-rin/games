@@ -247,7 +247,8 @@ const HOME_COLS = [1,3,5,7,9];
 
 // ----- Game state -----
 let state = 'title'; // title | playing | over | win | paused
-let score = 0, lives = 3, level = 1, best = +(localStorage.getItem('cosmicHopBest')||0);
+const STARTING_LIVES = 5;
+let score = 0, lives = STARTING_LIVES, level = 1, best = +(localStorage.getItem('cosmicHopBest')||0);
 let homes = []; // {col, filled, charType}
 let cars = [];  // road obstacles
 let logs = [];  // water platforms
@@ -337,7 +338,7 @@ function makeLevel() {
     {row:10, dir: 1, baseSpeed: 120, type:'car',     count:3, gap: 220},
   ];
   roadConfig.forEach(cfg => {
-    const speed = cfg.baseSpeed * speedScale * cfg.dir;
+    const speed = cfg.baseSpeed * speedScale * cfg.dir * 0.85;
     const width = {scooter:42, car:64, racer:58, van:96}[cfg.type];
     const totalSpan = cfg.count * cfg.gap;
     for (let i=0;i<cfg.count;i++) {
@@ -818,7 +819,7 @@ function drawHUD() {
   // Lives (hearts)
   ctx.font = "600 12px 'Fredoka', sans-serif";
   ctx.textAlign='right'; ctx.fillText('LIVES', W-16, 8);
-  for (let i=0;i<3;i++) {
+  for (let i=0;i<STARTING_LIVES;i++) {
     const hx = W - 16 - i*22;
     drawHeart(hx-8, 32, 9, i<lives ? '#fff' : 'rgba(255,255,255,0.3)');
   }
@@ -1545,7 +1546,7 @@ function showTitle() {
 }
 
 function startGame() {
-  score = 0; lives = 3; level = 1;
+  score = 0; lives = STARTING_LIVES; level = 1;
   makeLevel();
   state = 'playing';
   document.getElementById('titleScreen').classList.add('hidden');
@@ -1563,7 +1564,7 @@ function nextLevel() {
 }
 
 function retry() {
-  score = 0; lives = 3; level = 1;
+  score = 0; lives = STARTING_LIVES; level = 1;
   makeLevel();
   state = 'playing';
   document.getElementById('overScreen').classList.add('hidden');
