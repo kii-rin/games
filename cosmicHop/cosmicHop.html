@@ -170,7 +170,7 @@
       </div>
     </div>
     <button class="btn-primary" id="startBtn">PLAY ✨</button>
-    <div class="info">Hop across the busy road and surf across the ocean to reach the hibiscus flower homes!</div>
+    <div class="info">Hop across the busy road and surf across the ocean to reach the hibiscus flower homes! Each buddy you bring home adds one hop per move for the next buddy.</div>
   </div>
 
   <!-- GAME OVER -->
@@ -247,7 +247,8 @@ const HOME_COLS = [1,3,5,7,9];
 
 // ----- Game state -----
 let state = 'title'; // title | playing | over | win | paused
-let score = 0, lives = 3, level = 1, best = +(localStorage.getItem('cosmicHopBest')||0);
+const STARTING_LIVES = 5;
+let score = 0, lives = STARTING_LIVES, level = 1, best = +(localStorage.getItem('cosmicHopBest')||0);
 let homes = []; // {col, filled, charType}
 let cars = [];  // road obstacles
 let logs = [];  // water platforms
@@ -337,7 +338,7 @@ function makeLevel() {
     {row:10, dir: 1, baseSpeed: 120, type:'car',     count:3, gap: 220},
   ];
   roadConfig.forEach(cfg => {
-    const speed = cfg.baseSpeed * speedScale * cfg.dir;
+    const speed = cfg.baseSpeed * speedScale * cfg.dir * 0.85;
     const width = {scooter:42, car:64, racer:58, van:96}[cfg.type];
     const totalSpan = cfg.count * cfg.gap;
     for (let i=0;i<cfg.count;i++) {
@@ -412,6 +413,9 @@ function resetPlayer() {
     targetX: 5 * CELL + CELL/2,
     targetY: HUD_H + ROW_START * CELL + CELL/2,
     facing: 'up',
+    hopsPerMove: homes.filter(h => h.filled).length + 1,
+    hopsRemaining: 0,
+    hopDirection: null,
     hop: 0,           // 0..1 animation
     ridingLog: null,
     onLog: false,
@@ -427,16 +431,29 @@ function resetPlayer() {
 const keys = {};
 function tryMove(dir) {
   if (state !== 'playing') return;
-  if (player.hop > 0 && player.hop < 1) return; // mid-hop
+  if (player.hop > 0 || player.hopsRemaining > 0) return;
+  player.hopDirection = dir;
+  player.hopsRemaining = player.hopsPerMove;
+  continueHop();
+}
+
+function continueHop() {
+  const dir = player.hopDirection;
+  player.hopsRemaining--;
+  if (!startHop(dir)) player.hopsRemaining = 0;
+}
+
+function startHop(dir) {
   let dc=0, dr=0;
   if (dir==='up') { dr=-1; player.facing='up'; }
   else if (dir==='down') { dr=1; player.facing='down'; }
   else if (dir==='left') { dc=-1; player.facing='left'; }
   else if (dir==='right') { dc=1; player.facing='right'; }
+  else return false;
   const nc = player.col + dc, nr = player.row + dr;
-  if (nc<0 || nc>=COLS || nr<0 || nr>ROWS-1) return;
+  if (nc<0 || nc>=COLS || nr<0 || nr>ROWS-1) return false;
   // moving onto home row only allowed on home cells
-  if (nr === ROW_HOME && !HOME_COLS.includes(nc)) return;
+  if (nr === ROW_HOME && !HOME_COLS.includes(nc)) return false;
   player.col = nc; player.row = nr;
   player.targetX = nc * CELL + CELL/2;
   player.targetY = HUD_H + nr * CELL + CELL/2;
@@ -444,6 +461,7 @@ function tryMove(dir) {
   sfx('hop');
   score += 2; // small reward for moving forward (any direction; will subtract for back below)
   if (dir==='up') score += 3; // bonus for upward
+  return true;
 }
 
 window.addEventListener('keydown', (e) => {
@@ -489,8 +507,12 @@ function update(dt) {
     player.hop += dt * 6.5; // ~150ms hop
     if (player.hop >= 1) {
       player.hop = 0;
-      // landed
+      // Resolve this landing before starting another hop in the sequence.
+      player.x = player.targetX;
+      player.y = player.targetY;
+      const landedPlayer = player;
       onLanded();
+      if (state !== 'playing' || player !== landedPlayer) return;
     } else {
       const t = player.hop;
       player.x = lerp(player.x, player.targetX, 0.35);
@@ -595,6 +617,9 @@ function update(dt) {
       }
     }
   }
+
+  // Continue only after this landing has passed all hazard checks.
+  if (player.hop === 0 && player.hopsRemaining > 0) continueHop();
 
   // Spawn pretty water ripples while on water
   if (player.onLog && Math.random() < 0.1) {
@@ -785,10 +810,16 @@ function drawHUD() {
   ctx.font = "700 26px 'Bubblegum Sans', cursive";
   ctx.fillText(String(level), W/2, 22);
 
+  // Current buddy's automatic hop sequence length.
+  ctx.font = "600 12px 'Fredoka', sans-serif";
+  ctx.fillText('HOPS', W/2 + 82, 8);
+  ctx.font = "700 26px 'Bubblegum Sans', cursive";
+  ctx.fillText(String(player.hopsPerMove), W/2 + 82, 22);
+
   // Lives (hearts)
   ctx.font = "600 12px 'Fredoka', sans-serif";
   ctx.textAlign='right'; ctx.fillText('LIVES', W-16, 8);
-  for (let i=0;i<3;i++) {
+  for (let i=0;i<STARTING_LIVES;i++) {
     const hx = W - 16 - i*22;
     drawHeart(hx-8, 32, 9, i<lives ? '#fff' : 'rgba(255,255,255,0.3)');
   }
@@ -1515,7 +1546,7 @@ function showTitle() {
 }
 
 function startGame() {
-  score = 0; lives = 3; level = 1;
+  score = 0; lives = STARTING_LIVES; level = 1;
   makeLevel();
   state = 'playing';
   document.getElementById('titleScreen').classList.add('hidden');
@@ -1533,7 +1564,7 @@ function nextLevel() {
 }
 
 function retry() {
-  score = 0; lives = 3; level = 1;
+  score = 0; lives = STARTING_LIVES; level = 1;
   makeLevel();
   state = 'playing';
   document.getElementById('overScreen').classList.add('hidden');
